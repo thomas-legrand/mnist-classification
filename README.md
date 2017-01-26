@@ -39,4 +39,16 @@ Congratulations, you are all set!
 
 ## Usage
 
-TODO
+`python3 test_service.py --host 127.0.0.1 --port 9000`
+
+## Future work
+
+take input as jpg file
+
+training endpoint
+
+unit testing (For unit testing see: http://flask.pocoo.org/docs/0.12/quickstart/ section accessing request data)
+
+multiple models
+
+scaling issues (mention basic web server) (Deploying? on Googe App Engine)

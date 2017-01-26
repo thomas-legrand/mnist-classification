@@ -2,6 +2,7 @@ import constants
 from keras.datasets import mnist
 from keras.utils import np_utils
 
+
 def load_and_process_mnist_data():
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 

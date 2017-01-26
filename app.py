@@ -15,10 +15,9 @@ app = Flask(__name__)
 
 def validate_input_data(data):
     try:
-        correct_nb_rows = len(data) == constants.IMG_ROWS
-        correct_nb_cols = all(len(data[i]) == constants.IMG_COLS for i in range(len(data)))
-        all_ints = all(isinstance(pixel, int) for row in data for pixel in row)
-        return correct_nb_rows and correct_nb_cols and all_ints
+        correct_length = len(data) == constants.FLAT_IMAGE_LENGTH
+        all_float = all(isinstance(pixel, float) for pixel in data)
+        return correct_length and all_float
     except TypeError:
         return False
 
@@ -63,4 +62,4 @@ if __name__ == "__main__":
     handler = handlers.RotatingFileHandler('classify.log', maxBytes=10000, backupCount=1)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    app.run(port=9000, debug=True)
+    app.run(host=constants.DEFAULT_HOST, port=constants.DEFAULT_PORT, debug=True)
