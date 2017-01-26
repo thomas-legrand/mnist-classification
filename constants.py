@@ -2,7 +2,7 @@
 # Service
 #########
 
-SERVICE_ENDPOINT = "http://35.164.83.223:9000/mnist/classify"
+SERVICE_ENDPOINT = "http://127.0.0.1:9000/mnist/classify"
 
 ######
 # Data
@@ -38,11 +38,6 @@ KERNEL_SIZE = (3, 3)
 
 PLANET_ASCII_ART = \
 """
-
-
-
-
-
 
                                                                ``  ``````
                                                                             ``
@@ -135,10 +130,4 @@ PLANET_ASCII_ART = \
                                                                                 .`
                                                                              ``
                                                                        ```
-
-
-
-
-
-
 """

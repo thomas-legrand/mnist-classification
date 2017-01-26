@@ -15,10 +15,13 @@ app = Flask(__name__)
 
 
 def validate_input_data(data):
-    correct_nb_rows = len(data) == constants.IMG_ROWS
-    correct_nb_cols = all(len(data[i]) == constants.IMG_COLS for i in range(len(data)))
-    all_ints = all(isinstance(pixel, int) for row in data for pixel in row)
-    return correct_nb_rows and correct_nb_cols and all_ints
+    try:
+        correct_nb_rows = len(data) == constants.IMG_ROWS
+        correct_nb_cols = all(len(data[i]) == constants.IMG_COLS for i in range(len(data)))
+        all_ints = all(isinstance(pixel, int) for row in data for pixel in row)
+        return correct_nb_rows and correct_nb_cols and all_ints
+    except TypeError:
+        return False
 
 
 @app.route('/mnist/classify', methods=['POST'])
@@ -43,8 +46,14 @@ def make_predict():
 
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(error):
+    # add logging here
     return render_template('404.html', planet_ascii_art=constants.PLANET_ASCII_ART), 404
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    # add logging here
+    return render_template('405.html', planet_ascii_art=constants.PLANET_ASCII_ART), 405
 
 
 if __name__ == "__main__":
