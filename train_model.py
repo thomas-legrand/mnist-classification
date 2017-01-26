@@ -1,8 +1,21 @@
 import constants
+import argparse
+import load_and_process
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
+
+parser = argparse.ArgumentParser(description='Train a classification model.')
+parser.add_argument('--filename',
+                    default=constants.CNN_MODEL_FILENAME,
+                    help='Filename to save the model to')
+parser.add_argument('--epoch', type=int,
+                    default=constants.NB_EPOCH,
+                    help='Number of epoch to train the model for')
+parser.add_argument('--batchsize', type=int,
+                    default=constants.BATCH_SIZE,
+                    help='Size of batches to use for training')
 
 
 def train_cnn(data,
@@ -40,3 +53,13 @@ def train_cnn(data,
               verbose=1, validation_data=(X_test, Y_test))
 
     model.save(model_name)
+
+
+def main():
+    args = parser.parse_args()
+    data = load_and_process.load_and_process_mnist_data()
+    train_cnn(data, args.filename, args.epoch, args.batchsize)
+
+
+if __name__ == '__main__':
+    main()
