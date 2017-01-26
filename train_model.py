@@ -1,6 +1,8 @@
 import constants
 import argparse
+import logging
 import load_and_process
+import os
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
@@ -18,10 +20,7 @@ parser.add_argument('--batchsize', type=int,
                     help='Size of batches to use for training')
 
 
-def train_cnn(data,
-              model_name=constants.CNN_MODEL_FILENAME,
-              nb_epoch=constants.NB_EPOCH,
-              batch_size=constants.BATCH_SIZE):
+def train_cnn(data, model_name, nb_epoch, batch_size):
     X_train, X_test, Y_train, Y_test = data
 
     np.random.seed(constants.RANDOM_STATE)  # for reproducibility
@@ -52,10 +51,13 @@ def train_cnn(data,
               batch_size=batch_size, nb_epoch=nb_epoch,
               verbose=1, validation_data=(X_test, Y_test))
 
-    model.save(model_name)
+    filepath = os.path.join(constants.MODELS_DIR, model_name)
+    model.save(filepath)
+    logging.info("Successfully saved new model at %s", filepath)
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     args = parser.parse_args()
     data = load_and_process.load_and_process_mnist_data()
     train_cnn(data, args.filename, args.epoch, args.batchsize)

@@ -21,6 +21,7 @@ FLAT_IMAGE_LENGTH = IMG_ROWS * IMG_COLS
 # Model training
 ################
 
+MODELS_DIR = 'models'
 CNN_MODEL_FILENAME = 'cnn_model.h5'
 
 RANDOM_STATE = 2017

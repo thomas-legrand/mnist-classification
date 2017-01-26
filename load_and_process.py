@@ -1,3 +1,4 @@
+import logging
 import constants
 from keras.datasets import mnist
 from keras.utils import np_utils
@@ -14,8 +15,8 @@ def load_and_process_mnist_data():
     X_test = X_test.astype('float32')
     X_train /= 255
     X_test /= 255
-    print(X_train.shape[0], 'train samples')
-    print(X_test.shape[0], 'test samples')
+    logging.info('%d train samples', X_train.shape[0])
+    logging.info('%d test samples', X_test.shape[0])
 
     # convert class vectors to binary class matrices
     Y_train = np_utils.to_categorical(y_train, constants.NB_CLASSES)

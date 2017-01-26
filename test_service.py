@@ -16,7 +16,7 @@ parser.add_argument('--port', type=int,
 
 
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
-X_test = X_test.reshape(constants.NB_TEST_EXAMPLES, constants.FLAT_IMAGE_LENGTH)
+X_test = X_test.reshape(X_test.shape[0], constants.IMG_ROWS, constants.IMG_COLS, 1)
 X_test = X_test.astype('float32')
 X_test /= 255
 
@@ -29,10 +29,10 @@ def make_sample_request(url):
     sample = random.randint(0, constants.NB_TEST_EXAMPLES)
     data = X_test[sample].tolist()
     a = json.dumps(data)
-    logging.info("Making POST request to url: {}".format(url))
+    logging.info("Making POST request to url: %s", url)
     r = requests.post(url, a)
-    logging.info("Status code is {}".format(r.status_code))
-    logging.info("Classification service predicted: {0}, target: {1}".format(r.json()["classification"], y_test[sample]))
+    logging.info("Status code is %d", r.status_code)
+    logging.info("Classification service predicted: %s, target: %d", r.json()["classification"], y_test[sample])
 
 
 def main():
