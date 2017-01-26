@@ -2,7 +2,9 @@
 # Service
 #########
 
-SERVICE_ENDPOINT = "http://127.0.0.1:9000/mnist/classify"
+DEFAULT_PORT = 9000
+DEFAULT_HOST = "localhost"
+PATH = "/mnist/classify"
 
 ######
 # Data
