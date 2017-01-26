@@ -16,14 +16,19 @@ parser.add_argument('--host',
 parser.add_argument('--port', type=int,
                     default=constants.DEFAULT_PORT,
                     help='port on which to run the service')
-parser.add_argument('--filename',
+parser.add_argument('--model',
                     default=constants.CNN_MODEL_FILENAME,
                     help='Model filename to use for prediction')
+
+# we need to make graph a global variable
+# see https://github.com/fchollet/keras/issues/2397#issuecomment-254919212
+# similarly we make model global, so we don't have to pass it as argument to the classification function
 global graph, model
 app = Flask(__name__)
 
 
 def validate_input_data(data):
+    """Validation of the input data. Checks nb of rows and columns"""
     try:
         correct_nb_rows = len(data) == constants.IMG_ROWS
         correct_nb_cols = all(len(data[i]) == constants.IMG_COLS for i in range(len(data)))
@@ -34,6 +39,7 @@ def validate_input_data(data):
 
 @app.route('/mnist/classify', methods=['POST'])
 def make_predict():
+    """Classification function for our app. Called when the endpoint /mnist/classify is hit"""
     data = request.get_json(force=True)
 
     # validate that the data is in the expected format.
@@ -58,11 +64,13 @@ def make_predict():
 
 @app.errorhandler(404)
 def page_not_found(error):
+    """Render neat template when page not found"""
     return render_template('404.html', planet_ascii_art=constants.PLANET_ASCII_ART), 404
 
 
 @app.errorhandler(405)
 def method_not_allowed(error):
+    """Render neat template when method not allowed"""
     return render_template('405.html', planet_ascii_art=constants.PLANET_ASCII_ART), 405
 
 
@@ -71,14 +79,13 @@ if __name__ == "__main__":
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
     args = parser.parse_args()
-    # get the default graph for future reference.
-    # see https://github.com/fchollet/keras/issues/2397#issuecomment-254919212
+
     try:
-        filepath = os.path.join(constants.MODELS_DIR, args.filename)
+        filepath = os.path.join(constants.MODELS_DIR, args.model)
         model = load_model(filepath)
     except OSError as e:
         msg = "Model file could not be found at {0}. Error: {1}".format(args.filename, e)
         logging.error(msg)
         exit(1)
     graph = tf.get_default_graph()
-    app.run(host=args.host, port=args.port, debug=True)
+    app.run(host=args.host, port=args.port)

@@ -5,6 +5,7 @@ from keras.utils import np_utils
 
 
 def load_and_process_mnist_data():
+    """Load MNIST data and shape it, scale it and make targets categorical."""
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
     # this assumes that we are using a TensorFlow backend

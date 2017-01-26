@@ -8,7 +8,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
 
-parser = argparse.ArgumentParser(description='Train a classification model.')
+parser = argparse.ArgumentParser(description='Train a CNN model on the MNIST dataset.')
 parser.add_argument('--filename',
                     default=constants.CNN_MODEL_FILENAME,
                     help='Filename to save the model to')
@@ -21,6 +21,10 @@ parser.add_argument('--batchsize', type=int,
 
 
 def train_cnn(data, model_name, nb_epoch, batch_size):
+    """
+    Trains a Convolutional Neural Network on the MNIST dataset
+    Largely inspired from https://github.com/fchollet/keras/blob/master/examples/mnist_{cnn, mlp}.py
+    """
     X_train, X_test, Y_train, Y_test = data
 
     np.random.seed(constants.RANDOM_STATE)  # for reproducibility

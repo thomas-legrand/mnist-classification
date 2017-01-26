@@ -22,10 +22,12 @@ X_test /= 255
 
 
 def get_service_url(host, port, path=constants.PATH):
+    """Construct a service URL from host, port and path"""
     return "".join(["http://", host, ":", str(port), path])
 
 
 def make_sample_request(url):
+    """Make a sample request to the service"""
     sample = random.randint(0, constants.NB_TEST_EXAMPLES)
     data = X_test[sample].tolist()
     a = json.dumps(data)

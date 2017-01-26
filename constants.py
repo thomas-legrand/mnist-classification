@@ -1,3 +1,8 @@
+"""
+This file holds defaults and constants we use for loading the data, training the model,
+setting up and testing the service, rendering templates
+"""
+
 #########
 # Service
 #########
