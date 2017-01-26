@@ -32,6 +32,9 @@ Prerequisites: we suppose that `git` and `python3` are already installed.
 
 `git clone git@github.com:thomas-legrand/planet.git`
 
+If that does not work, try:
+`git clone git@github.com:thomas-legrand/mnist-classification.git`
+
 * Create a virtual environment and activate it
 
 `virtualenv flask-aws`
