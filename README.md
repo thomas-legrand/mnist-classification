@@ -11,10 +11,10 @@ POST /mnist/classify
 ## Installation
 
 These installation steps assume that you are working on an Ubuntu 64 bits machine.
-If working on Windows or Mac, please look for the corresponding installation steps online.
+If working on a Windows or Mac machine, please look for the corresponding installation steps online.
 An easy way to get such a setup is to launch an Amazon EC2 instance with this [tutorial](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-launch-instance_linux).
 
-Prerequisites: git and python3
+Prerequisites: we suppose that `git` and `python3` are already present on the system.
 
 * Download the package lists from the repositories
 
@@ -47,14 +47,14 @@ Congratulations, you are all set!
 
 ### Starting the service
 
-Starting the service is as simply as `python3 app.py --host 0.0.0.0--port 9000`.
+Starting the service is as simple as `python3 app.py --host 0.0.0.0--port 9000`.
 
 Make sure that the machine is set up to accept inbound HTTP traffic from any IP. 
 On Amazon EC2, you can do this by updating the security group assigned to your VM.
 
 ### Making a test request
 
-You can make a test request to the service using the command line tool `test_service.py`:
+You can make a test request to the service (from another machine or the same one) using the command line interface `test_service.py`:
 
 ```python3 test_service.py --host 35.166.130.221 --port 9000```
 
@@ -62,14 +62,27 @@ The `host` IP should be replaced by the Public IP of the machine/VM running the 
 
 ### Underlying classification model
 
-A default classification model is provided in the `models/` folder.
-It is a simple CNN, trained on 10 epoch with a default batch size.
+A classification model is provided in the `models/` folder.
+It is a CNN, trained on 10 epoch with a default batch size.
 It was trained using the command below and showed 98.69% accuracy on the test set.
 
 ```python3 train_model.py --filename cnn_model.h5 --epoch 10```
 
 The model can be re-trained in the exact same way. 
-Make sure you provide a filename to save it.
+Make sure you provide the filename to save it.
+
+
+## Repository organization
+
+- `README.md`: this README file
+- `app.py`: launch a Flask app
+- `train_model.py`: train a CNN on the MNIST data
+- `load_and_process.py`: load the MNIST dataset and pre-process it
+- `test_service.py`: issue test requests to a given endpoint
+- `templates/`: error pages templates
+- `models/`: directory to save folders
+- `requirements.txt`: requirements for the package
+
 
 ## Future work
 
@@ -80,4 +93,4 @@ They range from simple to advanced.
  - provide a training endpoint, where users can train the model
  - unit testing (for Flask see http://flask.pocoo.org/docs/0.12/quickstart/#accessing-request-data)
  - provide multiple classfication models
- - we are using Flask builtin web server. This is good enough for testing but could not be used in production.
+ - we are using Flask builtin web server. This is good enough for testing but should not be used in production.
