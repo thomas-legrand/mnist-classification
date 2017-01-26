@@ -2,8 +2,7 @@ import numpy as np
 from flask import Flask, jsonify, request
 from keras.models import load_model
 import tensorflow as tf
-
-MLP_MODEL_FILENAME = 'ddmlp.h5'
+from constants import *
 
 model = load_model(MLP_MODEL_FILENAME)
 

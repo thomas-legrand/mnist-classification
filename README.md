@@ -1,9 +1,12 @@
-# Take-home challenge for Planet
+# Take-home challenge
 
 ## Instructions
 
-
-
+Create a service using a python web framework such as flask or django that takes an mnist image as a post request and returns a JSON blob with the classification of that image. http://yann.lecun.com/exdb/mnist/
+```
+POST /mnist/classify
+    Returns the class of the image. Invalid input should return a 404.
+```
 
 ## Installation
 
