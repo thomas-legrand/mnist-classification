@@ -53,6 +53,10 @@ Make sure that the machine is set up to accept inbound HTTP traffic from any IP.
 On Amazon EC2, you can do this by updating the security group assigned to your VM.
 If running the service locally, please use `--host 127.0.0.1`.
 
+Please note that the service takes as input take as input a (28 * 28) array of pixels,
+each having values between 0 and 255 (included). I listed in the future work section
+the TODO of accepting images as a POST request.
+
 ### Making a test request
 
 You can make a test request to the service (from another machine or the same one) using the command line interface `test_service.py`:
