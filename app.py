@@ -2,7 +2,6 @@ import numpy as np
 from flask import Flask, jsonify, request
 from keras.models import load_model
 import tensorflow as tf
-import models
 
 MLP_MODEL_FILENAME = 'ddmlp.h5'
 
@@ -25,7 +24,7 @@ def make_predict():
     predict_request = np.array(data)
     global graph
     with graph.as_default():
-        preds = model.predict_classes(predict_request.reshape(1, models.FLAT_IMAGE_LENGTH), verbose=0)
+        preds = model.predict_classes(predict_request.reshape(1, 784), verbose=0)
     output = {"ddmlp": str(preds[0])}
     # jsonify is the safe way to generate a JSON file to return
     # see http://flask.pocoo.org/docs/0.10/security/#json-security

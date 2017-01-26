@@ -72,6 +72,3 @@ model.fit(X_train, Y_train,
 model.save(app.MLP_MODEL_FILENAME)
 model = load_model(app.MLP_MODEL_FILENAME)
 preds = model.predict_classes(X_test, verbose=0)
-
-data = X_test[1].tolist()
-predict_request = np.array(data, ndmin=2)
