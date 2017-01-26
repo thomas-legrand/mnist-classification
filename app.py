@@ -14,13 +14,22 @@ graph = tf.get_default_graph()
 app = Flask(__name__)
 
 
+def validate_input_data(data):
+    correct_nb_rows = len(data) == constants.IMG_ROWS
+    correct_nb_cols = all(len(data[i]) == constants.IMG_COLS for i in range(len(data)))
+    all_ints = all(isinstance(pixel, int) for row in data for pixel in row)
+    return correct_nb_rows and correct_nb_cols and all_ints
+
+
 @app.route('/mnist/classify', methods=['POST'])
 def make_predict():
     # error checking
-    if False:
-        abort(404)
 
     data = request.get_json(force=True)
+
+    if not validate_input_data(data):
+        abort(404)
+
     # convert data to numpy array
     predict_request = np.array(data).reshape(1, constants.FLAT_IMAGE_LENGTH)
 
