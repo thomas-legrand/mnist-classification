@@ -14,7 +14,7 @@ These installation steps assume that you are working on an Ubuntu 64 bits machin
 If working on a Windows or Mac machine, please look for the corresponding installation steps online.
 An easy way to get such a setup is to launch an Amazon EC2 instance with this [tutorial](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-launch-instance_linux).
 
-Prerequisites: we suppose that `git` and `python3` are already present on the system.
+Prerequisites: we suppose that `git` and `python3` are already installed.
 
 * Download the package lists from the repositories
 
@@ -47,16 +47,17 @@ Congratulations, you are all set!
 
 ### Starting the service
 
-Starting the service is as simple as `python3 app.py --host 0.0.0.0--port 9000`.
+Starting the service is as simple as running: `python3 app.py --host 0.0.0.0 --port 5000`.
 
 Make sure that the machine is set up to accept inbound HTTP traffic from any IP. 
 On Amazon EC2, you can do this by updating the security group assigned to your VM.
+If running the service locally, please use `--host 127.0.0.1`.
 
 ### Making a test request
 
 You can make a test request to the service (from another machine or the same one) using the command line interface `test_service.py`:
 
-```python3 test_service.py --host 35.166.130.221 --port 9000```
+```python3 test_service.py --host 35.166.130.221 --port 5000```
 
 The `host` IP should be replaced by the Public IP of the machine/VM running the service.
 

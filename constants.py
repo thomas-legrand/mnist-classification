@@ -7,7 +7,7 @@ setting up and testing the service, rendering templates
 # Service
 #########
 
-DEFAULT_PORT = 9000
+DEFAULT_PORT = 5000
 DEFAULT_HOST = "127.0.0.1"
 PATH = "/mnist/classify"
 
