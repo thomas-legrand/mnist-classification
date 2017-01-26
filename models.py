@@ -1,58 +1,58 @@
-from keras.layers.core import Dense, Activation, Dropout
-from keras.models import Sequential, load_model
-from keras.utils import np_utils
+from __future__ import print_function
 import numpy as np
-import pickle
-from sklearn import svm, datasets, model_selection
+np.random.seed(1337)  # for reproducibility
+import app
+from keras.datasets import mnist
+from keras.models import Sequential, load_model
+from keras.layers.core import Dense, Dropout, Activation
+from keras.optimizers import RMSprop
+from keras.utils import np_utils
 
+FLAT_IMAGE_LENGTH = 784
 
-# load digits data
-digits = datasets.load_digits()
+batch_size = 128
+nb_classes = 10
+nb_epoch = 3
 
-# train a SVM classifier on all but one data sample
-clf = svm.SVC(gamma=0.001, C=100.)
-clf.fit(digits.data[:-1], digits.target[:-1])
+# the data, shuffled and split between train and test sets
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
 
-# serialize the model
-pickle.dump(clf, open('svm', 'wb'))
+X_train = X_train.reshape(60000, FLAT_IMAGE_LENGTH)
+X_test = X_test.reshape(10000, FLAT_IMAGE_LENGTH)
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
+X_train /= 255
+X_test /= 255
+print(X_train.shape[0], 'train samples')
+print(X_test.shape[0], 'test samples')
 
-# Read data
-train = digits.data
-target = digits.target
+# convert class vectors to binary class matrices
+Y_train = np_utils.to_categorical(y_train, nb_classes)
+Y_test = np_utils.to_categorical(y_test, nb_classes)
 
-X_train, X_test, y_train, y_test = model_selection.train_test_split(train, target, test_size=.3)
-
-# convert list of labels to binary class matrix
-y_train = np_utils.to_categorical(y_train)
-y_test = np_utils.to_categorical(y_test)
-
-# pre-processing: divide by max and substract mean
-scale = np.max(X_train)
-X_train /= scale
-X_test /= scale
-
-mean = np.std(X_train)
-X_train -= mean
-X_test -= mean
-
-input_dim = X_train.shape[1]
-nb_classes = y_train.shape[1]
-
-# Here's a Deep Dumb MLP (DDMLP)
 model = Sequential()
-model.add(Dense(128, input_dim=input_dim))
+model.add(Dense(512, input_shape=(FLAT_IMAGE_LENGTH,)))
 model.add(Activation('relu'))
-model.add(Dropout(0.15))
-model.add(Dense(128))
+model.add(Dropout(0.2))
+model.add(Dense(512))
 model.add(Activation('relu'))
-model.add(Dropout(0.15))
-model.add(Dense(nb_classes))
+model.add(Dropout(0.2))
+model.add(Dense(10))
 model.add(Activation('softmax'))
 
-# we'll use categorical xent for the loss, and RMSprop as the optimizer
-model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+model.summary()
 
-model.fit(X_train, y_train, nb_epoch=10, batch_size=16, validation_split=0.1, show_accuracy=True, verbose=2)
-model.save('ddmlp.h5')
-model = load_model('ddmlp.h5')
+model.compile(loss='categorical_crossentropy',
+              optimizer=RMSprop(),
+              metrics=['accuracy'])
+
+model.fit(X_train, Y_train,
+          batch_size=batch_size, nb_epoch=nb_epoch,
+          verbose=1, validation_data=(X_test, Y_test))
+
+model.save(app.MLP_MODEL_FILENAME)
+model = load_model(app.MLP_MODEL_FILENAME)
 preds = model.predict_classes(X_test, verbose=0)
+
+data = X_test[1].tolist()
+predict_request = np.array(data, ndmin=2)
