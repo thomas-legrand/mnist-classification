@@ -26,15 +26,12 @@ def get_service_url(host, port, path=constants.PATH):
     return "".join(["http://", host, ":", str(port), path])
 
 
-def make_sample_request(url):
+def make_sample_request(url, filename):
     """Make a sample request to the service"""
-    sample = random.randint(0, constants.NB_TEST_EXAMPLES)
-    data = X_test[sample].tolist()
-    a = json.dumps(data)
     logging.info("Making POST request to url: %s", url)
-    r = requests.post(url, a)
+    r = requests.post(url, files={'image': open(filename, 'rb')})
     logging.info("Status code is %d", r.status_code)
-    logging.info("Classification service predicted: %s, target: %d", r.json()["classification"], y_test[sample])
+    logging.info("Classification service predicted: %s", r.json()["classification"])
 
 
 def main():

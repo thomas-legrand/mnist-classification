@@ -66,6 +66,8 @@ You can make a test request to the service (from another machine or the same one
 
 ```python3 test_service.py --host 35.166.130.221 --port 5000```
 
+```requests.post('http://127.0.0.1:5000/mnist/classify', files = {'image': open('test-data/200.jpg', 'rb')}).json()```
+
 The `host` IP should be replaced by the Public IP of the machine/VM running the service.
 
 ### Underlying classification model
