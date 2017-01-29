@@ -163,8 +163,8 @@ then use as the classification.
 - `train_model.py`: train a CNN on the MNIST data
 - `load_and_process.py`: load the MNIST dataset and pre-process it
 - `test_service.py`: issue test requests to a given endpoint
-- `test-data-0`: first set of test images, extracted from the web
-- `test-data-1`: second set of test images, handwritten by myself
+- `test-data-0/`: first set of test images, extracted from the web
+- `test-data-1/`: second set of test images, handwritten by myself
 - `templates/`: error pages templates
 - `models/`: directory to save folders
 - `requirements.txt`: requirements for the package
