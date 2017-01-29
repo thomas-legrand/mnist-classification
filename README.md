@@ -94,7 +94,14 @@ Make sure you provide the filename to save it.
 The service was implemented using [Flask](http://flask.pocoo.org/), a lightweight Python web framework.
 
 
-
+Features:
+ - Fast loading of a trained CNN model, using the Keras function `load_model`
+ - Checking provided file extension
+ - Handling of image processing with `OpenCV`
+ - Format validation of data to be fed to the model 
+ - Special error handling was implemented for 404 (page not found) and 405 (method not allowed), since only POST requests are allowed
+on the API endpoint (`mnist/classify`), with an ASCII art piece representing the Earth.
+ 
 
 ### Data
 
@@ -115,10 +122,22 @@ While the algorithm performs quite poorly on the first set, it does a decent job
 
 ### Image processing
 
-When provided with a raw `jpg` or `png` image, we used an `opencv` API for Python to transform it to the correct format.
-
+When provided with a raw `jpg` or `png` image, we used an `OpenCV` API for Python to transform it to the correct format.
+Steps:
+1. Decode image from the file byte stream, as a grayscale image
+2. Invert the image, to conform to MNIST standards (0 = white, 1 = black)
+3. Since the image is bimodal, use Otsu's binarization to choose the adequate threshold to binarize the image. 
+4. Finally resize the image to 28 * 28 pixels.
 
 ### Model training and saving
+
+We train a Convolutional Neural Network using Keras.
+We use a simpler version of the CNN provided by F. Chollet on the [Keras Github repository](https://github.com/fchollet/keras/blob/master/examples/mnist_cnn.py).
+
+It is a sequential model, containing a 2D Convolutional layer, followed by three Dense layers of decreasing sizes (256, 128 and 10 neurons).
+We include some Dropout layer to limit overfitting and finally use a softmax activation for the last layer that we can then use as the classification.
+
+
 
 ## Repository organization
 
