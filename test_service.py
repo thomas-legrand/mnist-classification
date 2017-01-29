@@ -1,5 +1,3 @@
-import random
-import json
 from keras.datasets import mnist
 import requests
 import constants
@@ -12,7 +10,9 @@ parser.add_argument('--host',
                     help='The host of the classification service')
 parser.add_argument('--port', type=int,
                     default=constants.DEFAULT_PORT,
-                    help='The port to make requests to the service')
+                    help='The port to which connect')
+parser.add_argument('--image',
+                    help='The path to an image file, either jpg or png')
 
 
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -38,7 +38,7 @@ def main():
     logging.basicConfig(level=logging.INFO)
     args = parser.parse_args()
     url = get_service_url(host=args.host, port=args.port)
-    make_sample_request(url)
+    make_sample_request(url, args.image)
 
 if __name__ == '__main__':
     main()

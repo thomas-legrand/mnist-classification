@@ -1,12 +1,14 @@
 import argparse
 import constants
-import os
+import cv2
 from flask import Flask, jsonify, request, render_template, abort
+from keras.models import load_model
 import logging
 from logging import handlers
 import numpy as np
-from keras.models import load_model
-import cv2
+import os
+
+
 import tensorflow as tf
 
 
@@ -45,34 +47,36 @@ def validate_input_data(data):
 
 
 def convert_to_mnist_format(f):
-    raw_img = cv2.imdecode(np.asarray(bytearray(f.stream.read()), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
-    im_gray = cv2.bitwise_not(raw_img)
-    (thresh, im_bw) = cv2.threshold(im_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    resized = cv2.resize(im_bw, (28, 28), interpolation=cv2.INTER_AREA)
-    return resized
+    try:
+        raw_img = cv2.imdecode(np.asarray(bytearray(f.stream.read()), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+        im_gray = cv2.bitwise_not(raw_img)
+        (thresh, im_bw) = cv2.threshold(im_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        img = cv2.resize(im_bw, (28, 28), interpolation=cv2.INTER_AREA)
+    except Exception as e:
+        app.logger.error("Image processing failed. Exception: %s", e)
+        abort(404)
+    if not isinstance(img, np.ndarray) or not validate_input_data(img):
+        app.logger.error("Image format validation failed")
+        abort(404)
+    return img
 
 
 @app.route('/mnist/classify', methods=['POST'])
 def make_predict_image():
+
     # Get the name of the uploaded file
     f = request.files['image']
+
     # Check if the file is one of the allowed types/extensions
-    if not f and not allowed_file(f.filename):
-        app.logger.error("Something went wrong when trying to classify input data. Aborting with 404 error. "
-                         "Exception: %s", e)
+    if not f or not allowed_file(f.filename):
+        app.logger.error("File upload error. File extension should be png or jpg.")
         abort(404)
 
-    try:
-        img = convert_to_mnist_format(f)
-    except Exception as e:
-        app.logger.error("Failed conversion to Numpy array")
-        app.logger.error(e)
-        abort(404)
-    if not isinstance(img, np.ndarray) or not validate_input_data(img):
-        app.logger.error("Failing to validate input data. Aborting with 404 error.")
-        abort(404)
+    # Convert the file to the mnist format (open cv np array, 28 * 28 pixels)
+    img = convert_to_mnist_format(f)
 
     try:
+        # Attempt to classify the given example
         predict_request = img.reshape(1, constants.IMG_ROWS, constants.IMG_COLS, 1)
         with graph.as_default():
             preds = model.predict_classes(predict_request, verbose=0)
@@ -81,12 +85,8 @@ def make_predict_image():
         # see http://flask.pocoo.org/docs/0.10/security/#json-security
         return jsonify({"classification": str(preds[0])})
     except Exception as e:
-        app.logger.error("Something went wrong when trying to classify input data. Aborting with 404 error. "
-                             "Exception: %s", e)
+        app.logger.error("Model prediction error. Exception: %s", e)
         abort(404)
-
-
-
 
 
 @app.errorhandler(404)
