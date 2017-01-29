@@ -30,15 +30,15 @@ Prerequisites: we suppose that `git` and `python3` are already installed.
 
 * Clone the project
 
-`git clone git@github.com:thomas-legrand/planet.git`
-
-If that does not work, try:
 `git clone git@github.com:thomas-legrand/mnist-classification.git`
 
 * Create a virtual environment and activate it
 
-`virtualenv flask-aws`
-`source flask-aws/bin/activate`
+```
+cd mnist-classification
+virtualenv flask-aws
+source flask-aws/bin/activate
+```
 
 * With `pip3`, install all the necessary packages
 
@@ -51,22 +51,24 @@ Congratulations, you are all set!
 ### Starting the service
 
 Starting the service is as simple as running: `python3 app.py --host 0.0.0.0 --port 5000`.
+The service host is now referred as the server.
 
-Make sure that the machine is set up to accept inbound HTTP traffic from any IP. 
+Make sure that the server is set up to accept inbound HTTP traffic from any IP. 
 On Amazon EC2, you can do this by updating the security group assigned to your VM.
 If running the service locally, please use `--host 127.0.0.1`.
 
-Please note that the service takes as input take as input a (28 * 28) array of pixels,
-each having values between 0 and 255 (included). I listed in the future work section
-the TODO of accepting images as a POST request.
+### Making a request to the server
 
-### Making a test request
+The service you just set up accepts only `jpg` or `png` images through POST requests.
 
-You can make a test request to the service (from another machine or the same one) using the command line interface `test_service.py`:
-
-```python3 test_service.py --host 35.166.130.221 --port 5000```
+To request a classification from the server, you need an input image, representing a (preferably handwritten) digit.
+Requests can be performed in two ways:
+1. directly from a python REPL:  
 
 ```requests.post('http://127.0.0.1:5000/mnist/classify', files = {'image': open('test-data/200.jpg', 'rb')}).json()```
+2. using a custom script provided: `test_service.py`:
+
+```python3 test_service.py --host 127.0.0.1 --port 5000 --image test-data/200.jpg```
 
 The `host` IP should be replaced by the Public IP of the machine/VM running the service.
 
@@ -76,11 +78,47 @@ A classification model is provided in the `models/` folder.
 It is a CNN, trained on 10 epoch with a default batch size.
 It was trained using the command below and showed 98.69% accuracy on the test set.
 
-```python3 train_model.py --filename cnn_model.h5 --epoch 10```
+```python3 train_model.py --filename new_cnn_model.h5 --epoch 10```
+
+Feel free to use it for "of the shelf" classifications.
 
 The model can be re-trained in the exact same way. 
 Make sure you provide the filename to save it.
 
+```python3 train_model.py --filename new_cnn_model.h5 --epoch 20 --batchsize 256```
+
+## Implementation
+
+### Service
+
+The service was implemented using [Flask](http://flask.pocoo.org/), a lightweight Python web framework.
+
+
+
+
+### Data
+
+1. Training data
+
+The MNIST dataset, provided with the `keras` package was used to train our classifer.
+60,000 training examples were used to fit the model and 10,000 to assess/report its performance.
+Training and testing examples are tuples of images pixels (28 * 28 array of pixels, int values ranging from 0 to 255 where 0 corresponds to white.)
+
+2. Test data
+
+We provide two small sets of testing data, in the form of raw images.
+- `test-digits-0`: digit images extracted from the web. Mix of handwritten and machine generated digits.
+- `test-digits-1`: handwritten digit images created by myself
+
+While the algorithm performs quite poorly on the first set, it does a decent job with the second one.
+
+
+### Image processing
+
+When provided with a raw `jpg` or `png` image, we used an `opencv` API for Python to transform it to the correct format.
+
+
+### Model training and saving
 
 ## Repository organization
 
@@ -89,6 +127,8 @@ Make sure you provide the filename to save it.
 - `train_model.py`: train a CNN on the MNIST data
 - `load_and_process.py`: load the MNIST dataset and pre-process it
 - `test_service.py`: issue test requests to a given endpoint
+- `test-data-0`: first set of test images, extracted from the web
+- `test-data-1`: second set of test images, handwritten by myself
 - `templates/`: error pages templates
 - `models/`: directory to save folders
 - `requirements.txt`: requirements for the package
@@ -99,7 +139,6 @@ Make sure you provide the filename to save it.
 I have not had the time to work on the following features, which would be nice to have.
 They range from simple to advanced.
 
- - take any image file as input (jpg, png, etc...) through the POST request
  - provide a training endpoint, where users can train the model
  - unit testing (for Flask see http://flask.pocoo.org/docs/0.12/quickstart/#accessing-request-data)
  - provide multiple classfication models
