@@ -44,7 +44,7 @@ source flask-aws/bin/activate
 
 * With `pip3`, install all the necessary packages
 
-`pip3 install -t requirements.txt`
+`pip3 install -r requirements.txt`
 
 Congratulations, you are all set!
 
@@ -70,13 +70,15 @@ Requests can be performed in two ways:
 
 1. directly from a python console:  
 
-```requests.post('http://127.0.0.1:5000/mnist/classify', files = {'image': open('test-data/200.jpg', 'rb')}).json()```
-
+```
+import requests
+requests.post('http://127.0.0.1:5000/mnist/classify', files = {'image': open('test-digits-0/200.jpg', 'rb')}).json()
+```
 2. using a custom script provided: `test_service.py`:
 
-```python3 test_service.py --host 127.0.0.1 --port 5000 --image test-data-0/200.jpg```
+```python3 test_service.py --host 127.0.0.1 --port 5000 --image test-digits-0/200.jpg```
 
-The `host` IP should be replaced by the Public IP of the machine/VM running the service.
+The `host` IP should be replaced by the Public IP of your server the service.
 
 ### Underlying classification model
 
