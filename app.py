@@ -1,3 +1,5 @@
+""" A command line interface to start a Flask service for classifying handwritten digits. """
+
 import argparse
 import constants
 import cv2
@@ -7,8 +9,6 @@ import logging
 from logging import handlers
 import numpy as np
 import os
-
-
 import tensorflow as tf
 
 
@@ -21,7 +21,7 @@ parser.add_argument('--port', type=int,
                     help='port on which to run the service')
 parser.add_argument('--model',
                     default=constants.CNN_MODEL_FILENAME,
-                    help='Model filename to use for prediction')
+                    help='Model filename to use for prediction. Needs to refer to a HDF5 file')
 
 # we need to make graph a global variable
 # see https://github.com/fchollet/keras/issues/2397#issuecomment-254919212
@@ -32,12 +32,23 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 
 
 def allowed_file(filename):
+    """
+    Validate the file extension.
+    :param filename: filename to check
+    :return: (boolean) whether the file is allowed
+    """
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
 
-def validate_input_data(data):
-    """Validation of the input data. Checks nb of rows and columns"""
+def validate_img_data(data):
+    """
+    Validate the processed image data. Checks number of rows and columns.
+    :param data: input numpy array
+    :return: (boolean) whether the processed image conforms to the expected format
+    """
+    if not isinstance(data, np.ndarray):
+        return False
     try:
         correct_nb_rows = len(data) == constants.IMG_ROWS
         correct_nb_cols = all(len(data[i]) == constants.IMG_COLS for i in range(len(data)))
@@ -46,16 +57,22 @@ def validate_input_data(data):
         return False
 
 
-def convert_to_mnist_format(f):
+def convert_to_mnist_format(input_file):
+    """
+    Convert input file to the MNIST format. Uses OpenCV for decoding and transforming the image.
+    :param input_file: input file, as received by the server in the request files
+    :return: (np.ndarray) processed image as a numpy array
+    """
     try:
-        raw_img = cv2.imdecode(np.asarray(bytearray(f.stream.read()), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+        raw_img = cv2.imdecode(np.asarray(bytearray(input_file.stream.read()), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
         im_gray = cv2.bitwise_not(raw_img)
         (thresh, im_bw) = cv2.threshold(im_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         img = cv2.resize(im_bw, (28, 28), interpolation=cv2.INTER_AREA)
     except Exception as e:
         app.logger.error("Image processing failed. Exception: %s", e)
         abort(404)
-    if not isinstance(img, np.ndarray) or not validate_input_data(img):
+        return
+    if not validate_img_data(img):
         app.logger.error("Image format validation failed")
         abort(404)
     return img
@@ -63,17 +80,25 @@ def convert_to_mnist_format(f):
 
 @app.route('/mnist/classify', methods=['POST'])
 def make_predict_image():
+    """
+    Hold the main logic of request parsing and response.
+
+    """
 
     # Get the name of the uploaded file
-    f = request.files['image']
+    input_image_file = request.files['image']
 
     # Check if the file is one of the allowed types/extensions
-    if not f or not allowed_file(f.filename):
+    if not input_image_file:
+        app.logger.error("File upload error.")
+        abort(404)
+
+    if not allowed_file(input_image_file.filename):
         app.logger.error("File upload error. File extension should be png or jpg.")
         abort(404)
 
-    # Convert the file to the mnist format (open cv np array, 28 * 28 pixels)
-    img = convert_to_mnist_format(f)
+    # Convert the file to the mnist format (opencv np array, 28 * 28 pixels)
+    img = convert_to_mnist_format(input_image_file)
 
     try:
         # Attempt to classify the given example
@@ -91,13 +116,13 @@ def make_predict_image():
 
 @app.errorhandler(404)
 def page_not_found(error):
-    """Render neat template when page not found"""
+    """ Render neat template when page not found """
     return render_template('404.html', planet_ascii_art=constants.PLANET_ASCII_ART), 404
 
 
 @app.errorhandler(405)
 def method_not_allowed(error):
-    """Render neat template when method not allowed"""
+    """ Render neat template when method not allowed """
     return render_template('405.html', planet_ascii_art=constants.PLANET_ASCII_ART), 405
 
 

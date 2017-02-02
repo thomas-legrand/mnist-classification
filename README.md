@@ -55,7 +55,7 @@ Congratulations, you are all set!
 Starting the service is as simple as running: `python3 app.py --host 0.0.0.0 --port 5000`.
 The service host is now referred as the server.
 
-Make sure that the server is set up to accept inbound HTTP traffic from any IP. 
+Make sure that the server is set up to accept inbound HTTP traffic from your IP (or easier: from any IP).
 On Amazon EC2, you can do this by updating the security group assigned to your VM.
 If running the service locally, please use `--host 127.0.0.1`.
 
@@ -68,13 +68,13 @@ Feel fre to use your own images or the ones in the two small test sets provided 
  
 Requests can be performed in two ways:
 
-1. directly from a python console:  
+- directly from a python console:
 
 ```
 import requests
 requests.post('http://127.0.0.1:5000/mnist/classify', files = {'image': open('test-digits-0/200.jpg', 'rb')}).json()
 ```
-2. using a custom script provided: `test_service.py`:
+- using a custom script provided: `test_service.py`:
 
 ```python3 test_service.py --host 127.0.0.1 --port 5000 --image test-digits-0/200.jpg```
 

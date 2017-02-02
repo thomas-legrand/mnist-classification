@@ -1,19 +1,22 @@
 """
-This file holds defaults and constants we use for loading the data, training the model,
-setting up and testing the service, rendering templates
+Defaults and constants for:
+- data loading
+- model training
+- setting up and testing service
+- rendering templates
 """
 
-#########
-# Service
-#########
+###########
+# Service #
+###########
 
 DEFAULT_PORT = 5000
 DEFAULT_HOST = "127.0.0.1"
 PATH = "/mnist/classify"
 
-######
-# Data
-######
+########
+# Data #
+########
 
 NB_TEST_EXAMPLES = 10000
 NB_TRAINING_EXAMPLES = 60000
@@ -22,9 +25,9 @@ NB_CLASSES = 10
 IMG_ROWS, IMG_COLS = 28, 28
 FLAT_IMAGE_LENGTH = IMG_ROWS * IMG_COLS
 
-################
-# Model training
-################
+##################
+# Model training #
+##################
 
 MODELS_DIR = 'models'
 CNN_MODEL_FILENAME = 'cnn_model.h5'
@@ -40,9 +43,9 @@ POOL_SIZE = (2, 2)
 # convolution kernel size
 KERNEL_SIZE = (3, 3)
 
-############
-# App
-############
+#######
+# App #
+#######
 
 PLANET_ASCII_ART = \
 """

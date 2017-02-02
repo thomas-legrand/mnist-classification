@@ -1,3 +1,5 @@
+""" Utility function to load and process MNIST data. Used to train model. """
+
 import logging
 import constants
 from keras.datasets import mnist
@@ -5,7 +7,10 @@ from keras.utils import np_utils
 
 
 def load_and_process_mnist_data():
-    """Load MNIST data and shape it, scale it and make targets categorical."""
+    """
+    Load MNIST data and shape it, scale it and make targets categorical.
+    :return: A tuple with 4 elements: {training / testing} {data / labels}
+    """
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
     # this assumes that we are using a TensorFlow backend

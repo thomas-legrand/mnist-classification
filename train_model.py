@@ -1,3 +1,5 @@
+""" Command line interface to train a classification model on the MNIST data """
+
 import constants
 import argparse
 import logging
