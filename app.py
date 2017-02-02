@@ -4,6 +4,7 @@ import argparse
 import constants
 import cv2
 from flask import Flask, jsonify, request, render_template, abort
+import io
 from keras.models import load_model
 import logging
 from logging import handlers
@@ -29,7 +30,7 @@ parser.add_argument('--model',
 global graph, model
 app = Flask(__name__)
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
-
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB
 
 def allowed_file(filename):
     """
@@ -64,9 +65,12 @@ def convert_to_mnist_format(input_file):
     :return: (np.ndarray) processed image as a numpy array
     """
     try:
-        raw_img = cv2.imdecode(np.asarray(bytearray(input_file.stream.read()), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
-        im_gray = cv2.bitwise_not(raw_img)
-        (thresh, im_bw) = cv2.threshold(im_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        in_memory_file = io.BytesIO()
+        input_file.save(in_memory_file)
+        data = np.fromstring(in_memory_file.getvalue(), dtype=np.uint8)
+        grey_img = cv2.imdecode(data, cv2.IMREAD_GRAYSCALE)
+        grey_inv_img = cv2.bitwise_not(grey_img)
+        (thresh, im_bw) = cv2.threshold(grey_inv_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         img = cv2.resize(im_bw, (28, 28), interpolation=cv2.INTER_AREA)
     except Exception as e:
         app.logger.error("Image processing failed. Exception: %s", e)
@@ -82,10 +86,12 @@ def convert_to_mnist_format(input_file):
 def make_predict_image():
     """
     Hold the main logic of request parsing and response.
-
     """
 
     # Get the name of the uploaded file
+    if not 'image' in request.files:
+        app.logger.error("Please upload an image in the 'image' form member.")
+        abort(404)
     input_image_file = request.files['image']
 
     # Check if the file is one of the allowed types/extensions
