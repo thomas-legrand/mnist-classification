@@ -88,22 +88,18 @@ def make_predict_image():
     Hold the main logic of request parsing and response.
     """
 
-    # Get the name of the uploaded file
-    if not 'image' in request.files:
+    # Check that there is data in the upload form 'image'
+    if 'image' not in request.files or not request.files['image']:
         app.logger.error("Please upload an image in the 'image' form member.")
         abort(404)
+
     input_image_file = request.files['image']
-
-    # Check if the file is one of the allowed types/extensions
-    if not input_image_file:
-        app.logger.error("File upload error.")
-        abort(404)
-
+    # Validate image extension
     if not allowed_file(input_image_file.filename):
         app.logger.error("File upload error. File extension should be png or jpg.")
         abort(404)
 
-    # Convert the file to the mnist format (opencv np array, 28 * 28 pixels)
+    # Convert the file to the mnist format (numpy array, 28 * 28 pixels, pixel: 0 <> background, 255 <> max signal)
     img = convert_to_mnist_format(input_image_file)
 
     try:
