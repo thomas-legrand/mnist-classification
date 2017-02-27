@@ -32,6 +32,7 @@ app = Flask(__name__)
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB
 
+
 def allowed_file(filename):
     """
     Validate the file extension.
@@ -138,7 +139,7 @@ if __name__ == "__main__":
         filepath = os.path.join(constants.MODELS_DIR, args.model)
         model = load_model(filepath)
     except OSError as e:
-        msg = "Model file could not be found at {0}. Error: {1}".format(args.filename, e)
+        msg = "Model file could not be found at {0} or was invalid. Error: {1}".format(args.filename, e)
         logging.error(msg)
         exit(1)
     graph = tf.get_default_graph()
